@@ -9,6 +9,4 @@ I hate the fact that my Pocket list grows larger and larger as I keep adding art
  * tag (black-/whitelist certain tags) 
  * favored / not favored
 
-I will probably add other options while the development of Pickpocket advances.  
-
-Pickpocket will run on node.js.
+I will probably add other options while the development of Pickpocket advances.

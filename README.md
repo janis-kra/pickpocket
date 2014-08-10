@@ -10,3 +10,7 @@ I hate the fact that my Pocket list grows larger and larger as I keep adding art
  * favored / not favored
 
 The application will run on node.js.
+
+##Usage
+
+http://janis-kra.github.io/Pickpocket

@@ -1,5 +1,4 @@
 #Pickpocket
-==========
 
 ##Introduction
 

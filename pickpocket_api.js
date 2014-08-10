@@ -23,13 +23,14 @@ module.exports.obtainRequestToken = function (callback) {
 		headers : header
 	};
 
-	console.log('requesting...');
 	var req = https.request(options, function(res) {
 
 		res.setEncoding('utf-8');
 
 		res.on('data', function(d) {
-			callback(null, JSON.parse(d).code);
+			var data = JSON.parse(d);
+			data.redirectUri = authenticate.redirect_uri;
+			callback(null, data);
 		});
 	});
 
@@ -40,3 +41,19 @@ module.exports.obtainRequestToken = function (callback) {
 		callback(e);
 	});
 }
+
+module.exports.authorize = function (requestToken, redirectUri, callback) {
+	console.log(requestToken);
+	console.log(redirectUri);
+
+	// https.request(function (res) {
+	// 	console.log('redirecting');
+	// 	res.setHeader('Location', 'https://getpocket.com/auth/authorize?request_token='
+	// 		+ requestToken
+	// 		+ '&redirect_uri='
+	// 		+ redirectUri);
+	// 	callback(null, e);
+	// }).on('error', function (e) {
+	// 	callback(e);
+	// });
+};

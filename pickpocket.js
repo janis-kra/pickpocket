@@ -4,6 +4,8 @@ pickpocket.obtainRequestToken(function (error, data) {
 	if (error) {
 		console.log(error);
 	} else {
-		console.log(data);
+		var requestToken = data.code;
+		var redirectUri = data.redirectUri;
+		pickpocket.authorize(requestToken, redirectUri);
 	}
 });

@@ -6,6 +6,12 @@ pickpocket.obtainRequestToken(function (error, data) {
 	} else {
 		var requestToken = data.code;
 		var redirectUri = data.redirectUri;
-		pickpocket.authorize(requestToken, redirectUri);
+		var authorizeUrl = pickpocket.authorize(requestToken, redirectUri, function (e, data) {
+			if (e) {
+				console.log(e);
+			} else {
+				console.log(data);
+			}
+		});
 	}
 });

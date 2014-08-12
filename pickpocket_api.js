@@ -43,17 +43,23 @@ module.exports.obtainRequestToken = function (callback) {
 }
 
 module.exports.authorize = function (requestToken, redirectUri, callback) {
-	console.log(requestToken);
-	console.log(redirectUri);
+	if (requestToken.isEmpty() || redirectUri.isEmpty()) {
+		callback('invalid params:\n'
+		 + requestToken 
+		 + '\n' + redirectUri);
+	} else {
+		callback(null, 'https://getpocket.com/auth/authorize?request_token='
+			+ requestToken
+			+ '&redirect_uri='
+			+ redirectUri);
+	}
+};
 
-	// https.request(function (res) {
-	// 	console.log('redirecting');
-	// 	res.setHeader('Location', 'https://getpocket.com/auth/authorize?request_token='
-	// 		+ requestToken
-	// 		+ '&redirect_uri='
-	// 		+ redirectUri);
-	// 	callback(null, e);
-	// }).on('error', function (e) {
-	// 	callback(e);
-	// });
+
+// --------------------
+// Some utility functions for making the code easier to read
+// --------------------
+
+String.prototype.isEmpty = function() {
+    return (this.length === 0 || !this.trim());
 };

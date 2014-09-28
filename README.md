@@ -10,3 +10,15 @@ I hate the fact that my Pocket list grows larger and larger as I keep adding art
  * favored / not favored
 
 I will probably add other options while the development of Pickpocket advances.
+
+##Dependencies
+
+ * [open](https://github.com/jjrdn/node-open)
+
+##Tasks
+
+ * add a killer application image (such as, a hand pickpocketing something from somewhere...)
+ * implement delete-by-date feature
+ * implement additional features:
+    * whitelisting via tag/source/favored
+    * more to come (probably)

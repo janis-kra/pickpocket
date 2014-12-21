@@ -51,7 +51,6 @@ module.exports.obtainRequestToken = function (callback) {
 	});
 }
 
-module.exports.authorize = function (requestToken, redirectUri, callback) {
 
 /**
  * Build a URL that can be called to authorize the application on the pocket
@@ -64,10 +63,14 @@ module.exports.authorize = function (requestToken, redirectUri, callback) {
  * @param {Function} callback: The function to be called upon completion 
  * of the request. Should conform the the syntax function(error, data).
  */
+module.exports.getAuthorizationURL = 
+	function (requestToken, redirectUri, callback) {
+
 	if (requestToken.isEmpty() || redirectUri.isEmpty()) {
 		callback('invalid params:\n'
 		 + requestToken 
-		 + '\n' + redirectUri);
+		 + '\n' 
+		 + redirectUri);
 	} else {
 		callback(null, 'https://getpocket.com/auth/authorize?request_token='
 			+ requestToken

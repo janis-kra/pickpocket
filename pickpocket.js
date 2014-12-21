@@ -7,7 +7,7 @@ var onReceiveToken = function (error, data) {
 	} else {
 		var requestToken = data.code;
 		var redirectUri = data.redirectUri;
-		var authorizeUrl = pickpocket.authorize(requestToken, redirectUri, function (e, data) {
+		var authorizeUrl = pickpocket.getAuthorizationURL(requestToken, redirectUri, function (e, data) {
 			if (e) {
 				console.log(e);
 			} else {

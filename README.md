@@ -11,6 +11,16 @@ I hate the fact that my Pocket list grows larger and larger as I keep adding art
 
 I will probably add other options while the development of Pickpocket advances.
 
+##Usage
+
+node pickpocket.js *deletion-threshold*  
+
+Where the deletion threshold is the age (in days) that your items must reach in order to be deleted by Pickpocket.  
+
+Example:  
+
+>*node pickpocket.js 365*
+
 ##Dependencies
 
  * [open](https://github.com/jjrdn/node-open)

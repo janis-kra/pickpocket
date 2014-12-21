@@ -15,11 +15,15 @@ I will probably add other options while the development of Pickpocket advances.
 
 node pickpocket.js *deletion-threshold*  
 
-Where the deletion threshold is the age (in days) that your items must reach in order to be deleted by Pickpocket.  
+Where the deletion threshold is the age (in days) that your items must reach in order to be deleted by Pickpocket.
 
-Example:  
+###Examples
 
->*node pickpocket.js 365*
+Delete everything older than a year:
+>*node pickpocket.js 365*  
+
+Never delete anything:
+>*node pickpocket.js 0*  
 
 ##Dependencies
 

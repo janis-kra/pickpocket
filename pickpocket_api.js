@@ -1,5 +1,14 @@
 var https = require('https');
 
+
+/**
+ * Calls the Pocket API via HTTPS to obtain a request token that 
+ * is used for every subsequent call to the Pocket API.
+ *
+ * @param {Function} callback: The function to be called upon
+ * completion of the request. Should conform the the syntax
+ * function(error, data).
+ */
 module.exports.obtainRequestToken = function (callback) {
 
 	var authenticate = {
@@ -43,6 +52,18 @@ module.exports.obtainRequestToken = function (callback) {
 }
 
 module.exports.authorize = function (requestToken, redirectUri, callback) {
+
+/**
+ * Build a URL that can be called to authorize the application on the pocket
+ * website.
+ *
+ * @param {String} requestToken: The request token that was requested 
+ * using obtainRequestToken.
+ * @param {String} redirectUri: The URL that the user will be redirected 
+ * to after the authorization was completed.
+ * @param {Function} callback: The function to be called upon completion 
+ * of the request. Should conform the the syntax function(error, data).
+ */
 	if (requestToken.isEmpty() || redirectUri.isEmpty()) {
 		callback('invalid params:\n'
 		 + requestToken 

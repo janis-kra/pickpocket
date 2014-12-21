@@ -1,7 +1,7 @@
 var pickpocket = require('./pickpocket_api'),
 	open = require('open');
 
-pickpocket.obtainRequestToken(function (error, data) {
+var onReceiveToken = function (error, data) {
 	if (error) {
 		console.log(error);
 	} else {
@@ -15,4 +15,6 @@ pickpocket.obtainRequestToken(function (error, data) {
 			}
 		});
 	}
-});
+};
+
+pickpocket.obtainRequestToken(onReceiveToken);

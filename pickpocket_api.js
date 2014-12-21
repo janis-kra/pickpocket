@@ -80,6 +80,16 @@ module.exports.getAuthorizationURL =
 };
 
 
+/**
+ *
+ * @param {Array} options: Options for the service: [deletion-threshold]
+ * (currently, there is only this one option available).
+ */
+module.exports.startService = function(options) {
+	console.log(options[0]);
+};
+
+
 // --------------------
 // Some utility functions for making the code easier to read
 // --------------------

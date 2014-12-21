@@ -1,6 +1,8 @@
 var pickpocket = require('./pickpocket_api'),
 	open = require('open');
 
+var options = [];
+
 var onReceiveToken = function (error, data) {
 	if (error) {
 		console.log(error);
@@ -17,4 +19,13 @@ var onReceiveToken = function (error, data) {
 	}
 };
 
-pickpocket.obtainRequestToken(onReceiveToken);
+var deletionThreshold = argv.process[2];
+
+if (!isNan(deletionThreshold)) {
+	options[0] = deletionThreshold;
+
+	pickpocket.obtainRequestToken(onReceiveToken);
+	pickpocket.startService(options);
+} else {
+	console.log("Usage: node pickpocket.js deletion-threshold");
+}

@@ -6,7 +6,9 @@
   "dependencies": {
     "open": "^0.0.5"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "eslint-config-janiskra": "^1.3.3"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

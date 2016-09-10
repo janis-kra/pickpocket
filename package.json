@@ -1,0 +1,27 @@
+{
+  "name": "pickpocket",
+  "version": "0.1.0",
+  "description": "Automatically removes unread items matching specific (configurable) criteria from the user's list to retain a slim list.",
+  "main": "pickpocket.js",
+  "dependencies": {
+    "open": "^0.0.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/janis-kra/Pickpocket.git"
+  },
+  "keywords": [
+    "pocket",
+    "productivity"
+  ],
+  "author": "Janis Krasemann <krasemann.janis@gmail.com> (http://www.github.com/janis-kra)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/janis-kra/Pickpocket/issues"
+  },
+  "homepage": "https://github.com/janis-kra/Pickpocket#readme"
+}

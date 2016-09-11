@@ -6,7 +6,9 @@ const createObtainRequestToken = function createObtainRequestToken (consumer = '
    * @return {Promise} a promise that either resolves with the token string, or
    * rejects with an error message
    */
-  return function obtainRequestToken ({ consumerKey = consumer }) {
+  return function obtainRequestToken ({
+    consumerKey = consumer
+  } = {}) {
     return new Promise((resolve, reject) => {
       if (consumerKey === '') {
         reject('no consumer key given');
@@ -16,18 +18,18 @@ const createObtainRequestToken = function createObtainRequestToken (consumer = '
         redirect_uri: 'http://janis-kra.github.io/Pickpocket'
       };
       const pocket = new GetPocket(config);
-      const params = {
-        redirect_uri: config.redirect_uri
-      };
-      pocket.getRequestToken(params, (err, resp, body) => {
-        if (err) {
-          reject(`Oops; getTokenRequest failed: ${err}`);
-        } else {
-          const json = JSON.parse(body);
-          const requestToken = config.request_token = json.code;
-          resolve(requestToken);
+      pocket.getRequestToken(
+        { redirect_uri: config.redirect_uri },
+        (err, resp, body) => {
+          if (err) {
+            reject(`Oops; getTokenRequest failed: ${err}`);
+          } else {
+            const json = JSON.parse(body);
+            const requestToken = config.request_token = json.code;
+            resolve(requestToken);
+          }
         }
-      });
+      );
     });
   };
 };
@@ -44,7 +46,7 @@ const createGetAuthorizeURL = function createGetAuthorizeURL (consumer = '') {
   return function authorize ({
     requestToken = '',
     consumerKey = consumer
-  }) {
+  } = {}) {
     return new Promise((resolve, reject) => {
       if (requestToken === '') {
         reject('no request token given - obtain one by calling obtainRequestToken');
@@ -59,7 +61,8 @@ const createGetAuthorizeURL = function createGetAuthorizeURL (consumer = '') {
       const pocket = new GetPocket(config);
       const url = pocket.getAuthorizeURL({
         consumer_key: consumerKey,
-        request_token: requestToken || config.request_token
+        request_token: requestToken || config.request_token,
+        redirect_uri: 'http://janis-kra.github.io/Pickpocket'
       });
       resolve(url);
     });
@@ -69,7 +72,7 @@ const createGetAuthorizeURL = function createGetAuthorizeURL (consumer = '') {
 module.exports = ({
   consumerKey = '',
   log = console.log
-}) => {
+} = {}) => {
   if (consumerKey === '') {
     log('no consumer key given, remember to pass it as an argument to each api call');
   }
@@ -78,12 +81,4 @@ module.exports = ({
     getAuthorizeURL: createGetAuthorizeURL(consumerKey),
     obtainRequestToken: createObtainRequestToken(consumerKey)
   };
-};
-
-// --------------------
-// Some utility functions for making the code easier to read
-// --------------------
-
-String.prototype.isEmpty = function () {
-  return (this.length === 0 || !this.trim());
 };

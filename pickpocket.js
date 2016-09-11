@@ -1,62 +1,82 @@
-const https = require('https');
+const GetPocket = require('node-getpocket');
 
-module.exports = ({ consumerKey = '' }) => {
-  const obtainRequestToken = function obtainRequestToken (callback) {
-    const authenticate = {
-      consumer_key: consumerKey,
-      redirect_uri: 'http://janis-kra.github.io/Pickpocket'
-    };
-
-    const authenticationStr = JSON.stringify(authenticate);
-
-    const header = {
-      'Content-Type': 'application/json, charset=UTF8',
-      'Content-Length': authenticationStr.length,
-      'X-Accept': 'application/json'
-    };
-
-    const options = {
-      hostname: 'getpocket.com',
-      port: 443,
-      path: '/v3/oauth/request',
-      method: 'POST',
-      headers: header
-    };
-
-    const req = https.request(options, (res) => {
-      res.setEncoding('utf-8');
-
-      res.on('data', (d) => {
-        const data = JSON.parse(d);
-        data.redirectUri = authenticate.redirect_uri;
-        callback(null, data);
+const createObtainRequestToken = function createObtainRequestToken (consumer = '') {
+  /**
+   * Gets a request token from the getpocket webservice endpoint
+   * @return {Promise} a promise that either resolves with the token string, or
+   * rejects with an error message
+   */
+  return function obtainRequestToken ({ consumerKey = consumer }) {
+    return new Promise((resolve, reject) => {
+      if (consumerKey === '') {
+        reject('no consumer key given');
+      }
+      const config = {
+        consumer_key: consumerKey,
+        redirect_uri: 'http://janis-kra.github.io/Pickpocket'
+      };
+      const pocket = new GetPocket(config);
+      const params = {
+        redirect_uri: config.redirect_uri
+      };
+      pocket.getRequestToken(params, (err, resp, body) => {
+        if (err) {
+          reject(`Oops; getTokenRequest failed: ${err}`);
+        } else {
+          const json = JSON.parse(body);
+          const requestToken = config.request_token = json.code;
+          resolve(requestToken);
+        }
       });
     });
+  };
+};
 
-    req.write(authenticationStr);
-    req.end();
-
-    req.on('error', (e) => {
-      callback(e);
+const createGetAuthorizeURL = function createGetAuthorizeURL (consumer = '') {
+  /**
+   * Builds a URL that can be used to authorize the application with the
+   * getpocket service.
+   * @param  {string}   requestToken the request token that was obtained, e.g.
+   * via getRequestToken (may be omitted if getRequestToken was called earlier)
+   * @return {Promise} a promise that either resolves with the authorization
+   * url, or rejects with an error message
+   */
+  return function authorize ({
+    requestToken = '',
+    consumerKey = consumer
+  }) {
+    return new Promise((resolve, reject) => {
+      if (requestToken === '') {
+        reject('no request token given - obtain one by calling obtainRequestToken');
+      }
+      if (consumerKey === '') {
+        reject('no consumer key given');
+      }
+      const config = {
+        consumer_key: consumerKey,
+        redirect_uri: 'http://janis-kra.github.io/Pickpocket'
+      };
+      const pocket = new GetPocket(config);
+      const url = pocket.getAuthorizeURL({
+        consumer_key: consumerKey,
+        request_token: requestToken || config.request_token
+      });
+      resolve(url);
     });
   };
+};
 
-  const authorize = function authorize (requestToken, redirectUri, callback) {
-    if (requestToken.isEmpty() || redirectUri.isEmpty()) {
-      callback('invalid params:\n' +
-        requestToken +
-        '\n' + redirectUri);
-    } else {
-      callback(null, 'https://getpocket.com/auth/authorize?request_token=' +
-        requestToken +
-        '&redirect_uri=' +
-        redirectUri);
-    }
-  };
+module.exports = ({
+  consumerKey = '',
+  log = console.log
+}) => {
+  if (consumerKey === '') {
+    log('no consumer key given, remember to pass it as an argument to each api call');
+  }
 
   return {
-    authorize: authorize,
-    obtainRequestToken: obtainRequestToken
+    getAuthorizeURL: createGetAuthorizeURL(consumerKey),
+    obtainRequestToken: createObtainRequestToken(consumerKey)
   };
 };
 

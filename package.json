@@ -4,7 +4,7 @@
   "description": "Automatically removes unread items matching specific (configurable) criteria from the user's list to retain a slim list.",
   "main": "pickpocket.js",
   "dependencies": {
-    "open": "^0.0.5"
+    "node-getpocket": "^1.0.0",
   },
   "devDependencies": {
     "eslint-config-janiskra": "^1.3.3"

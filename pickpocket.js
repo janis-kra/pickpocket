@@ -1,31 +1,30 @@
 const GetPocket = require('node-getpocket');
 
-const createObtainRequestToken = function createObtainRequestToken (consumer = '') {
+const REDIRECT_URI = 'http://janis-kra.github.io/Pickpocket';
+const ERR_MODULE_NOT_INITIALIZED = 'module not initialized correctly ' +
+  '(pass your consumer key as a parameter)';
+const ERR_NO_REQUEST_TOKEN = 'no request token given - get one by calling obtainRequestToken';
+
+const createObtainRequestToken = function createObtainRequestToken (getpocket = {}) {
   /**
    * Gets a request token from the getpocket webservice endpoint
    * @return {Promise} a promise that either resolves with the token string, or
    * rejects with an error message
    */
-  return function obtainRequestToken ({
-    consumerKey = consumer
-  } = {}) {
+  return function obtainRequestToken () {
+    // FIXME Promise { <pending> }
     return new Promise((resolve, reject) => {
-      if (consumerKey === '') {
-        reject('no consumer key given');
+      if (getpocket === {}) {
+        reject(ERR_MODULE_NOT_INITIALIZED);
       }
-      const config = {
-        consumer_key: consumerKey,
-        redirect_uri: 'http://janis-kra.github.io/Pickpocket'
-      };
-      const pocket = new GetPocket(config);
-      pocket.getRequestToken(
-        { redirect_uri: config.redirect_uri },
+      getpocket.getRequestToken(
+        { redirect_uri: REDIRECT_URI },
         (err, resp, body) => {
           if (err) {
             reject(`getTokenRequest failed: ${err}`);
           } else {
             const json = JSON.parse(body);
-            const requestToken = config.request_token = json.code;
+            const requestToken = json.code;
             resolve(requestToken);
           }
         }
@@ -34,34 +33,45 @@ const createObtainRequestToken = function createObtainRequestToken (consumer = '
   };
 };
 
-const createGetAuthorizeURL = function createGetAuthorizeURL (consumer = '') {
+const createGetAuthorizeURL = function createGetAuthorizeURL (getpocket = {}) {
   /**
    * Builds a URL that can be used to authorize the application with the
    * getpocket service.
-   * @param  {string}   requestToken the request token that was obtained, e.g.
-   * via getRequestToken (may be omitted if getRequestToken was called earlier)
-   * @return {Promise} a promise that either resolves with the authorization
-   * url, or rejects with an error message
+   * @return {string} the url that can be used to authorize the application
    */
-  return function getAuthorizationURL ({
-    requestToken = '',
-    consumerKey = consumer
-  } = {}) {
+  return function getAuthorizationURL ({ requestToken = '' } = {}) {
+    if (getpocket === {}) {
+      throw new Error(ERR_MODULE_NOT_INITIALIZED);
+    }
+    if (requestToken === '') {
+      throw new Error(ERR_NO_REQUEST_TOKEN);
+    }
+    return getpocket.getAuthorizeURL({
+      consumer_key: getpocket.config.consumer_key,
+      request_token: requestToken
+    });
+  };
+};
+
+const createObtainAccessToken = function createObtainAccessToken (getpocket = {}) {
+  return function obtainAccessToken ({ requestToken = '' } = {}) {
     return new Promise((resolve, reject) => {
       if (requestToken === '') {
-        reject('no request token given - obtain one by calling obtainRequestToken');
+        reject(ERR_NO_REQUEST_TOKEN);
       }
-      if (consumerKey === '') {
-        reject('no consumer key given');
-      }
-      const config = {
-        consumer_key: consumerKey,
-        redirect_uri: 'http://janis-kra.github.io/Pickpocket',
+      const params = {
         request_token: requestToken
       };
-      const pocket = new GetPocket(config);
-      const url = pocket.getAuthorizeURL(config);
-      resolve(url);
+      getpocket.getAccessToken(params, (err, resp, body) => {
+        if (err) {
+          reject(`Oops; getTokenRequest failed: ${err}`);
+        } else {
+        // your access token is in body.access_token
+          const json = JSON.parse(body);
+          const accessToken = json.access_token;
+          resolve(accessToken);
+        }
+      });
     });
   };
 };
@@ -70,12 +80,20 @@ module.exports = ({
   consumerKey = '',
   log = console.log
 } = {}) => {
-  if (consumerKey === '') {
-    log('no consumer key given, remember to pass it as an argument to each api call');
+  if (typeof consumerKey !== 'string' || consumerKey === '') {
+    throw new Error('no consumer key given, remember to pass it as an argument to each api call');
   }
 
+  const config = {
+    consumer_key: consumerKey,
+    redirect_uri: REDIRECT_URI
+  };
+  const getpocket = new GetPocket(config);
+  log(`Module successfully initialized using consumer key ${consumerKey}`);
+
   return {
-    getAuthorizationURL: createGetAuthorizeURL(consumerKey),
-    obtainRequestToken: createObtainRequestToken(consumerKey)
+    getAuthorizationURL: createGetAuthorizeURL(getpocket),
+    obtainAccessToken: createObtainAccessToken(getpocket),
+    obtainRequestToken: createObtainRequestToken(getpocket)
   };
 };

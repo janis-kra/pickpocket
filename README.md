@@ -15,7 +15,7 @@ I will probably add other options while the development of Pickpocket advances.
 ##Tasks
 
  * :star: implement basic functionality in the main module, this includes:
-   * authorization
+   * :white_check_mark: authorization
    * automatic deletion via lifespan criteria
    * deployment via `now` or a similar service possible
  * (optional / later) create a CLI that allows Pickpocket to be run via terminal

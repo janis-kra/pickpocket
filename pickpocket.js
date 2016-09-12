@@ -7,6 +7,32 @@ const ERR_MODULE_NOT_INITIALIZED = 'module not initialized correctly ' +
 const ERR_NO_REQUEST_TOKEN = 'no (valid) request token given - get one ' +
   'by calling obtainRequestToken';
 
+const createGetAllArticles = function createGetAllArticles (getpocket = {}, options = {}) {
+  return function getAllArticles () {
+    return new Promise((resolve, reject) => {
+      getpocket.get(Object.assign({}, {
+        detailType: 'simple'
+      }, options), (err, res) => {
+        if (err) {
+          reject(new Error(err));
+        }
+        resolve(res);
+      });
+    });
+  };
+};
+const createGetOverdueArticles = function createGetOverdueArticles (getpocket = {}, maxMonths = 6) {
+  const deletionThreshold = new Date();
+  deletionThreshold.setMonth(deletionThreshold.getMonth() - maxMonths);
+  return createGetAllArticles(getpocket, {
+    detailType: 'simple',
+    favorite: '0',
+    since: deletionThreshold, // FIXME this returns all articles that are newer than the given date, not older
+    sort: 'oldest',
+    state: 'unread'
+  });
+};
+
 const createObtainRequestToken = function createObtainRequestToken (getpocket = {}) {
   /**
    * Gets a request token from the getpocket webservice endpoint
@@ -86,7 +112,8 @@ const createObtainAccessToken = function createObtainAccessToken (getpocket = {}
 
 module.exports = ({
   consumerKey = '',
-  log = console.log
+  log = console.log,
+  maxMonths = 6
 } = {}) => {
   if (typeof consumerKey !== 'string' || consumerKey === '') {
     throw new Error('no consumer key given, remember to pass it as an argument to each api call');
@@ -100,8 +127,15 @@ module.exports = ({
   log(`Module successfully initialized using consumer key ${consumerKey}`);
 
   return {
+    getAllArticles: createGetAllArticles(getpocket),
+    getOverdueArticles: createGetOverdueArticles(getpocket, maxMonths),
     getAuthorizationURL: createGetAuthorizeURL(getpocket),
     obtainAccessToken: createObtainAccessToken(getpocket),
-    obtainRequestToken: createObtainRequestToken(getpocket)
+    obtainRequestToken: createObtainRequestToken(getpocket),
+    setAccessToken: (token) => getpocket.refreshConfig(Object.assign(
+      {},
+      getpocket.config,
+      { access_token: token }
+    ))
   };
 };

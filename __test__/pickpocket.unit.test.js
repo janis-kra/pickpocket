@@ -17,6 +17,16 @@ test('instantiating the module with invalid parameter type boolean', async t =>
     'module creation wihtout parameters should throw an error')
 );
 
+test('calling getAllArticles with unauthorized getpocket module', async t =>
+  t.throws(p.getAllArticles(), Error,
+    'calling getAllArticles with an unauthorized getpocket module should result in an error')
+);
+
+test('calling getOverdueArticles with unauthorized getpocket module', async t =>
+  t.throws(p.getOverdueArticles(), Error,
+    'calling getOverdueArticles with an unauthorized getpocket module should result in an error')
+);
+
 test('output of obtainRequestToken', async t =>
   p.obtainRequestToken().then((token) => {
     t.is(typeof token, 'string', 'valid call to obtainRequestToken resolves with a string');

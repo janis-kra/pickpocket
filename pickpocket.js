@@ -3,7 +3,8 @@ const GetPocket = require('node-getpocket');
 const REDIRECT_URI = 'http://janis-kra.github.io/Pickpocket';
 const ERR_MODULE_NOT_INITIALIZED = 'module not initialized correctly ' +
   '(pass your consumer key as a parameter)';
-const ERR_NO_REQUEST_TOKEN = 'no request token given - get one by calling obtainRequestToken';
+const ERR_NO_REQUEST_TOKEN = 'no (valid) request token given - get one ' +
+  'by calling obtainRequestToken';
 
 const createObtainRequestToken = function createObtainRequestToken (getpocket = {}) {
   /**
@@ -43,7 +44,7 @@ const createGetAuthorizeURL = function createGetAuthorizeURL (getpocket = {}) {
     if (getpocket === {}) {
       throw new Error(ERR_MODULE_NOT_INITIALIZED);
     }
-    if (requestToken === '') {
+    if (typeof requestToken !== 'string' || requestToken === '') {
       throw new Error(ERR_NO_REQUEST_TOKEN);
     }
     return getpocket.getAuthorizeURL({
@@ -56,8 +57,8 @@ const createGetAuthorizeURL = function createGetAuthorizeURL (getpocket = {}) {
 const createObtainAccessToken = function createObtainAccessToken (getpocket = {}) {
   return function obtainAccessToken ({ requestToken = '' } = {}) {
     return new Promise((resolve, reject) => {
-      if (requestToken === '') {
-        reject(ERR_NO_REQUEST_TOKEN);
+      if (typeof requestToken !== 'string' || requestToken === '') {
+        throw new Error(ERR_NO_REQUEST_TOKEN);
       }
       const params = {
         request_token: requestToken

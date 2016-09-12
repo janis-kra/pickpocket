@@ -49,7 +49,8 @@ const createGetAuthorizeURL = function createGetAuthorizeURL (getpocket = {}) {
     }
     return getpocket.getAuthorizeURL({
       consumer_key: getpocket.config.consumer_key,
-      request_token: requestToken
+      request_token: requestToken,
+      redirect_uri: REDIRECT_URI
     });
   };
 };
@@ -71,6 +72,11 @@ const createObtainAccessToken = function createObtainAccessToken (getpocket = {}
         } else {
           const json = JSON.parse(body);
           const accessToken = json.access_token;
+          getpocket.refreshConfig(Object.assign(
+            {},
+            getpocket.config,
+            { access_token: accessToken }
+          ));
           resolve(accessToken);
         }
       });

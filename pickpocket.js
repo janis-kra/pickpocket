@@ -1,3 +1,4 @@
+// TODO Add flow?
 const GetPocket = require('node-getpocket');
 
 const REDIRECT_URI = 'http://janis-kra.github.io/Pickpocket';
@@ -13,16 +14,15 @@ const createObtainRequestToken = function createObtainRequestToken (getpocket = 
    * rejects with an error message
    */
   return function obtainRequestToken () {
-    // FIXME Promise { <pending> }
     return new Promise((resolve, reject) => {
       if (getpocket === {}) {
-        reject(ERR_MODULE_NOT_INITIALIZED);
+        reject(new Error(ERR_MODULE_NOT_INITIALIZED));
       }
       getpocket.getRequestToken(
         { redirect_uri: REDIRECT_URI },
         (err, resp, body) => {
           if (err) {
-            reject(`getTokenRequest failed: ${err}`);
+            reject(new Error(err));
           } else {
             const json = JSON.parse(body);
             const requestToken = json.code;
@@ -65,9 +65,10 @@ const createObtainAccessToken = function createObtainAccessToken (getpocket = {}
       };
       getpocket.getAccessToken(params, (err, resp, body) => {
         if (err) {
-          reject(`Oops; getTokenRequest failed: ${err}`);
+          reject(new Error(err));
+        } else if (!body.startsWith('{')) {
+          reject(new Error(ERR_NO_REQUEST_TOKEN));
         } else {
-        // your access token is in body.access_token
           const json = JSON.parse(body);
           const accessToken = json.access_token;
           resolve(accessToken);

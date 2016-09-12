@@ -14,3 +14,11 @@ test('output of getAuthorizationURL with valid request token',
       'valid call to getAuthorizationURL returns a url');
   })
 );
+
+test('output of obtainAccessToken with unauthorized request token',
+  async t => t.throws(
+    p.obtainAccessToken({ requestToken: 'unauthorized_token' }),
+    Error,
+    'obtainAccessToken should throw a SyntaxError when called with an invalid request token'
+  )
+);

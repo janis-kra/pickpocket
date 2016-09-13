@@ -1,4 +1,12 @@
 module.exports = {
-  filter: function filter (data, { from = new Date(0) } = {}) {
+  filter: function* filter (articles, { from = Date.now() } = {}) {
+    if (!Array.isArray(articles)) {
+      throw new Error('*articles* array parameter must be present');
+    }
+    yield* articles.filter((a) => {
+      const timeAdded = new Date(parseInt(a.time_added, 10) * 1000);
+      // console.log('' + time_added + ' < ' + from);
+      return (timeAdded <= from);
+    });
   }
 };

@@ -5,7 +5,6 @@ module.exports = {
     }
     yield* articles.filter((a) => {
       const timeAdded = new Date(parseInt(a.time_added, 10) * 1000);
-      // console.log('' + time_added + ' < ' + from);
       return (timeAdded <= from);
     });
   }

@@ -15,7 +15,8 @@
     "lodash.values": "^4.3.0"
   },
   "scripts": {
-    "test": "ava pickpocket.test.js"
+    "test": "ava __test__/*.test.js",
+    "test:watch": "ava __test__/*.test.js -w"
   },
   "repository": {
     "type": "git",

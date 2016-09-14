@@ -1,5 +1,7 @@
 // TODO Add flow?
 const GetPocket = require('node-getpocket');
+const articles = require('./articles');
+const values = require('lodash.values');
 
 const REDIRECT_URI = 'http://janis-kra.github.io/Pickpocket';
 const ERR_MODULE_NOT_INITIALIZED = 'module not initialized correctly ' +
@@ -21,16 +23,50 @@ const createGetAllArticles = function createGetAllArticles (getpocket = {}, opti
     });
   };
 };
-const createGetOverdueArticles = function createGetOverdueArticles (getpocket = {}, maxMonths = 6) {
-  const deletionThreshold = new Date();
-  deletionThreshold.setMonth(deletionThreshold.getMonth() - maxMonths);
-  return createGetAllArticles(getpocket, {
-    detailType: 'simple',
-    favorite: '0',
-    since: deletionThreshold, // FIXME this returns all articles that are newer than the given date, not older
-    sort: 'oldest',
-    state: 'unread'
-  });
+
+const createGetOverdueArticles = function createGetOverdueArticles (getpocket = {}) {
+  return function getOverdueArticles ({
+    includeFavorites = true,
+    maxMonths = 6
+  } = {}) {
+    const getArticles = createGetAllArticles(getpocket, {
+      includeFavorites: includeFavorites,
+      sort: 'oldest',
+      state: 'unread'
+    });
+    return getArticles().then((a) => {
+      const deletionThreshold = new Date();
+      deletionThreshold.setMonth(deletionThreshold.getMonth() - maxMonths);
+      return articles.filter(values(a.list), {
+        includeFavorites: includeFavorites,
+        from: deletionThreshold
+      });
+    });
+  };
+};
+
+const createArchiveOverdueArticles = function createArchiveOverdueArticles (
+  getpocket = {}, log = console.log) {
+  return function archiveOverdueArticles ({
+    includeFavorites = true,
+    maxMonths = 6
+  } = {}) {
+    const getOverdueArticles = createGetOverdueArticles(getpocket, {
+      includeFavorites: includeFavorites,
+      maxMonths: maxMonths
+    });
+    getOverdueArticles().then((overdueArticles) => {
+      log('archiving: ');
+      for (const article of overdueArticles) {
+        getpocket.archive({ item_id: article.item_id }, (err) => {
+          if (err) {
+            log(`unable to archive ${article.item_id}`);
+          }
+          log(JSON.stringify(article));
+        });
+      }
+    });
+  };
 };
 
 const createObtainRequestToken = function createObtainRequestToken (getpocket = {}) {
@@ -112,8 +148,7 @@ const createObtainAccessToken = function createObtainAccessToken (getpocket = {}
 
 module.exports = ({
   consumerKey = '',
-  log = console.log,
-  maxMonths = 6
+  log = console.log
 } = {}) => {
   if (typeof consumerKey !== 'string' || consumerKey === '') {
     throw new Error('no consumer key given, remember to pass it as an argument to each api call');
@@ -128,8 +163,9 @@ module.exports = ({
 
   return {
     getAllArticles: createGetAllArticles(getpocket),
-    getOverdueArticles: createGetOverdueArticles(getpocket, maxMonths),
+    getOverdueArticles: createGetOverdueArticles(getpocket),
     getAuthorizationURL: createGetAuthorizeURL(getpocket),
+    archiveOverdueArticles: createArchiveOverdueArticles(getpocket, log),
     obtainAccessToken: createObtainAccessToken(getpocket),
     obtainRequestToken: createObtainRequestToken(getpocket),
     setAccessToken: (token) => getpocket.refreshConfig(Object.assign(

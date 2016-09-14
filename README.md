@@ -16,11 +16,11 @@ I will probably add other options while the development of Pickpocket advances.
 
  * :star: implement basic functionality in the main module, this includes:
    * :white_check_mark: authorization
-   * automatic deletion via lifespan criteria
-   * deployment via `now` or a similar service possible
+   * :white_check_mark: archive via lifespan criteria
  * (optional / later) create a CLI that allows Pickpocket to be run via terminal
+   * deployment via `now` or a similar service possible
  * add a killer application image (such as, a hand pickpocketing something from somewhere...)
- * implement delete-by-date feature
+ * :white_check_mark: implement delete-by-date feature
  * implement additional features:
     * whitelisting via tag/source/favored
     * ...

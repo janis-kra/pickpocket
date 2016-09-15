@@ -25,5 +25,7 @@ If pickpocket archived an item *foo* that you are totally gonna read sometime in
  * add a killer application image (such as, a hand pickpocketing something from somewhere...)
  * :white_check_mark: implement delete-by-date feature
  * implement additional features:
-    * whitelisting via tag/source/favored
+    * whitelisting via tag
+    * whitelisting via source
+    * :white_check_mark: whitelisting via favorited / not favorited
     * ...

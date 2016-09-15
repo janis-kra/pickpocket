@@ -26,11 +26,11 @@ const createGetAllArticles = function createGetAllArticles (getpocket = {}, opti
 
 const createGetOverdueArticles = function createGetOverdueArticles (getpocket = {}) {
   return function getOverdueArticles ({
-    includeFavorites = true,
+    includeFavorites = false,
     maxMonths = 6
   } = {}) {
     const getArticles = createGetAllArticles(getpocket, {
-      includeFavorites: includeFavorites,
+      favorite: includeFavorites,
       sort: 'oldest',
       state: 'unread'
     });
@@ -48,7 +48,7 @@ const createGetOverdueArticles = function createGetOverdueArticles (getpocket = 
 const createArchiveOverdueArticles = function createArchiveOverdueArticles (
   getpocket = {}, log = console.log) {
   return function archiveOverdueArticles ({
-    includeFavorites = true,
+    includeFavorites = false,
     maxMonths = 6
   } = {}) {
     const getOverdueArticles = createGetOverdueArticles(getpocket, {

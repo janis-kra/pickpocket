@@ -46,7 +46,7 @@ const createGetOverdueArticles = function createGetOverdueArticles (getpocket = 
 };
 
 const createArchiveOverdueArticles = function createArchiveOverdueArticles (
-  getpocket = {}, log = console.log) {
+  getpocket = {}, log = console.log, toggle = {}) {
   return function archiveOverdueArticles ({
     includeFavorites = false,
     maxMonths = 6
@@ -56,15 +56,20 @@ const createArchiveOverdueArticles = function createArchiveOverdueArticles (
       maxMonths: maxMonths
     });
     getOverdueArticles().then((overdueArticles) => {
-      log('archiving: ');
+      log('archiving...');
       for (const article of overdueArticles) {
-        getpocket.archive({ item_id: article.item_id }, (err) => {
-          if (err) {
-            log(`unable to archive ${article.item_id}`);
-          }
+        if (toggle.archive) {
+          getpocket.archive({ item_id: article.item_id }, (err) => {
+            if (err) {
+              log(`unable to archive ${article.item_id}`);
+            }
+            log(JSON.stringify(article));
+          });
+        } else {
           log(JSON.stringify(article));
-        });
+        }
       }
+      log('finished');
     });
   };
 };
@@ -165,7 +170,7 @@ module.exports = ({
     getAllArticles: createGetAllArticles(getpocket),
     getOverdueArticles: createGetOverdueArticles(getpocket),
     getAuthorizationURL: createGetAuthorizeURL(getpocket),
-    archiveOverdueArticles: createArchiveOverdueArticles(getpocket, log),
+    archiveOverdueArticles: createArchiveOverdueArticles(getpocket, log, { archive: false }),
     obtainAccessToken: createObtainAccessToken(getpocket),
     obtainRequestToken: createObtainRequestToken(getpocket),
     setAccessToken: (token) => getpocket.refreshConfig(Object.assign(

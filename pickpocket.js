@@ -1,4 +1,4 @@
-// TODO Add flow?
+/* @flow weak */
 const GetPocket = require('node-getpocket');
 const articles = require('./articles');
 const values = require('lodash.values');

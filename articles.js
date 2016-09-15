@@ -1,3 +1,4 @@
+/* @flow weak */
 module.exports = {
   filter: function* filter (articles, {
     includeFavorites = true,

@@ -11,6 +11,9 @@ I hate the fact that my Pocket list grows larger and larger as I keep adding art
 
 I will probably add other options while the development of Pickpocket advances.
 
+### Undo feature
+
+If pickpocket archived an item *foo* that you are totally gonna read sometime in the future - no problem. In any pocket app, go to your archive and re-add it. Also, the item will not be archived by pickpocket again in the near future, because the `time_added` for *foo* is now automatically set to the current time (not the one it was originally added on).
 
 ##Tasks
 

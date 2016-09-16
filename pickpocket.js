@@ -63,7 +63,7 @@ const createArchiveOverdueArticles = function createArchiveOverdueArticles (
             if (err) {
               log(`unable to archive ${article.item_id}`);
             }
-            log(JSON.stringify(article));
+            log(JSON.stringify(article.given_url));
           });
         } else {
           log(JSON.stringify(article));
@@ -152,11 +152,11 @@ const createObtainAccessToken = function createObtainAccessToken (getpocket = {}
 };
 
 module.exports = ({
-  consumerKey = '',
+  consumerKey = '30843-dc2a59fc91f1549e81c9101d',
   log = console.log
 } = {}) => {
   if (typeof consumerKey !== 'string' || consumerKey === '') {
-    throw new Error('no consumer key given, remember to pass it as an argument to each api call');
+    throw new Error('invalid consumerKey given');
   }
 
   const config = {

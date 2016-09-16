@@ -164,7 +164,6 @@ module.exports = ({
     redirect_uri: REDIRECT_URI
   };
   const getpocket = new GetPocket(config);
-  log(`Module successfully initialized using consumer key ${consumerKey}`);
 
   return {
     getAllArticles: createGetAllArticles(getpocket),

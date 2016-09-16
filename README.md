@@ -11,6 +11,9 @@ I hate the fact that my Pocket list grows larger and larger as I keep adding art
 
 I will probably add other options while the development of Pickpocket advances.
 
+### Undo archiving
+
+If pickpocket archived an item *foo* that you are totally gonna read sometime in the future - no problem. In any pocket app, go to your archive and re-add it. Also, the item will not be archived by pickpocket again in the near future, because the `time_added` for *foo* is now automatically set to the current time (not the one it was originally added on).
 
 ##Tasks
 
@@ -22,5 +25,7 @@ I will probably add other options while the development of Pickpocket advances.
  * add a killer application image (such as, a hand pickpocketing something from somewhere...)
  * :white_check_mark: implement delete-by-date feature
  * implement additional features:
-    * whitelisting via tag/source/favored
+    * whitelisting via tag
+    * whitelisting via source
+    * :white_check_mark: whitelisting via favorited / not favorited
     * ...

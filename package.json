@@ -33,6 +33,7 @@
   },
   "homepage": "https://github.com/janis-kra/Pickpocket#readme",
   "files": [
-    "pickpocket.js"
+    "pickpocket.js",
+    "articles.js"
   ]
 }

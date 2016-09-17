@@ -164,12 +164,14 @@ module.exports = ({
     redirect_uri: REDIRECT_URI
   };
   const getpocket = new GetPocket(config);
-
+  // TODO: Use stampit for ths?
   return {
     authorize: () => createObtainRequestToken(getpocket)().then(t => ({
       token: t,
       authorizationUrl: createGetAuthorizeURL(getpocket)({ requestToken: t })
     })),
+    isAuthorized: () => (typeof getpocket.config.access_token === 'string'
+      && getpocket.config.access_token !== ''),
     getAllArticles: createGetAllArticles(getpocket),
     getOverdueArticles: createGetOverdueArticles(getpocket),
     getAuthorizationURL: createGetAuthorizeURL(getpocket),

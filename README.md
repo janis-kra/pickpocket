@@ -28,4 +28,5 @@ If pickpocket archived an item *foo* that you are totally gonna read sometime in
     * whitelisting via tag
     * whitelisting via source
     * :white_check_mark: whitelisting via favorited / not favorited
+    * add a dedicated *pickpocket* tag to items that are archived by pickpocket (this way you have an immediate feedback that pickpocket is poking around in your pocket account)
     * ...

@@ -166,6 +166,10 @@ module.exports = ({
   const getpocket = new GetPocket(config);
 
   return {
+    authorize: () => createObtainRequestToken(getpocket)().then(t => ({
+      token: t,
+      authorizationUrl: createGetAuthorizeURL(getpocket)({ requestToken: t })
+    })),
     getAllArticles: createGetAllArticles(getpocket),
     getOverdueArticles: createGetOverdueArticles(getpocket),
     getAuthorizationURL: createGetAuthorizeURL(getpocket),

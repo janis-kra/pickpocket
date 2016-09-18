@@ -175,7 +175,7 @@ module.exports = ({
     getAllArticles: createGetAllArticles(getpocket),
     getOverdueArticles: createGetOverdueArticles(getpocket),
     getAuthorizationURL: createGetAuthorizeURL(getpocket),
-    archiveOverdueArticles: createArchiveOverdueArticles(getpocket, log, { archive: false }),
+    archiveOverdueArticles: createArchiveOverdueArticles(getpocket, log, { archive: true }),
     obtainAccessToken: createObtainAccessToken(getpocket),
     obtainRequestToken: createObtainRequestToken(getpocket),
     setAccessToken: (token) => getpocket.refreshConfig(Object.assign(

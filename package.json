@@ -1,6 +1,6 @@
 {
   "name": "pickpocket",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Automatically archives unread items matching specific (configurable) criteria from the user's list to retain a slim list.",
   "main": "pickpocket.js",
   "dependencies": {

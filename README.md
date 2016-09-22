@@ -17,7 +17,7 @@ If pickpocket archived an item *foo* that you are totally gonna read sometime in
 
 ##Tasks
 
- * :star: implement basic functionality in the main module, this includes:
+ * :white_check_mark: implement basic functionality in the main module, this includes:
    * :white_check_mark: authorization
    * :white_check_mark: archive via lifespan criteria
  * (optional / later) create a CLI that allows Pickpocket to be run via terminal

@@ -45,16 +45,37 @@ const createGetOverdueArticles = function createGetOverdueArticles (getpocket = 
   };
 };
 
+const createAddArchivedTag = function createAddArchivedTag (getpocket = {}) {
+  return function addArchivedTag (items = []) {
+    const params = {
+      actions: items.map(item => ({
+        action: 'tags_add',
+        item_id: item.item_id
+      }))
+    };
+    return new Promise((resolve, reject) => {
+      getpocket.send(params, (err, res) => {
+        if (res) {
+          resolve(true);
+        }
+        reject(err);
+      });
+    });
+  };
+};
+
 const createArchiveOverdueArticles = function createArchiveOverdueArticles (
   getpocket = {}, log = console.log, toggle = {}) {
   return function archiveOverdueArticles ({
     includeFavorites = false,
     maxMonths = 6
   } = {}) {
+    // TODO: Return the archived articels' array to the caller!
     const getOverdueArticles = createGetOverdueArticles(getpocket, {
       includeFavorites: includeFavorites,
       maxMonths: maxMonths
     });
+    const addArchivedTag = createAddArchivedTag(getpocket);
     getOverdueArticles().then((overdueArticles) => {
       log('archiving...');
       for (const article of overdueArticles) {
@@ -70,7 +91,7 @@ const createArchiveOverdueArticles = function createArchiveOverdueArticles (
         }
       }
       log('finished');
-    });
+    }).then(() => addArchivedTag());
   };
 };
 

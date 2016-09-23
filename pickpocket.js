@@ -3,27 +3,37 @@ const GetPocket = require('node-getpocket');
 const articles = require('./articles');
 const values = require('lodash.values');
 
+const PICKPOCKET_CONSUMER_KEY = '30843-dc2a59fc91f1549e81c9101d';
 const REDIRECT_URI = 'http://janis-kra.github.io/Pickpocket';
 const ERR_MODULE_NOT_INITIALIZED = 'module not initialized correctly ' +
   '(pass your consumer key as a parameter)';
 const ERR_NO_REQUEST_TOKEN = 'no (valid) request token given - get one ' +
   'by calling obtainRequestToken';
 
-const createGetAllArticles = function createGetAllArticles (getpocket = {}, options = {}) {
-  return function getAllArticles () {
-    return new Promise((resolve, reject) => {
-      getpocket.get(Object.assign({}, {
-        detailType: 'simple'
-      }, options), (err, res) => {
-        if (err) {
-          reject(new Error(err));
-        }
-        resolve(res);
-      });
-    });
-  };
-};
+const pocket = (config) => new GetPocket(config);
 
+const createConfig = (options) => Object.assign(
+  {},
+  { consumer_key: PICKPOCKET_CONSUMER_KEY, redirect_uri: REDIRECT_URI },
+  options
+);
+
+const getAllArticles = function getAllArticles ({
+  token = ''
+} = {}) {
+  return new Promise((resolve, reject) => {
+    GetPocket.get({
+      detailType: 'simple',
+      access_token: token
+    }, (err, res) => {
+      if (err) {
+        reject(new Error(err));
+      }
+      resolve(res);
+    });
+  });
+};
+// TODO: Continue purifying all the functions
 const createGetOverdueArticles = function createGetOverdueArticles (getpocket = {}) {
   return function getOverdueArticles ({
     includeFavorites = false,
@@ -95,81 +105,73 @@ const createArchiveOverdueArticles = function createArchiveOverdueArticles (
   };
 };
 
-const createObtainRequestToken = function createObtainRequestToken (getpocket = {}) {
-  /**
-   * Gets a request token from the getpocket webservice endpoint
-   * @return {Promise} a promise that either resolves with the token string, or
-   * rejects with an error message
-   */
-  return function obtainRequestToken () {
-    return new Promise((resolve, reject) => {
-      if (getpocket === {}) {
-        reject(new Error(ERR_MODULE_NOT_INITIALIZED));
+/**
+ * Gets a request token from the getpocket webservice endpoint
+ * @param options {object} an alternative consumer key
+ * @return {Promise} a promise that either resolves with the token string, or
+ * rejects with an error message
+ */
+const obtainRequestToken = function obtainRequestToken (
+  { consumerKey = PICKPOCKET_CONSUMER_KEY } = {}
+) {
+  return new Promise((resolve, reject) => {
+    const config = createConfig({ consumer_key: consumerKey });
+    pocket(config).getRequestToken(config, (err, resp, body) => {
+      if (err) {
+        reject(new Error(err));
+      } else {
+        const json = JSON.parse(body);
+        const requestToken = json.code;
+        resolve(requestToken);
       }
-      getpocket.getRequestToken(
-        { redirect_uri: REDIRECT_URI },
-        (err, resp, body) => {
-          if (err) {
-            reject(new Error(err));
-          } else {
-            const json = JSON.parse(body);
-            const requestToken = json.code;
-            resolve(requestToken);
-          }
-        }
-      );
     });
-  };
+  });
 };
 
-const createGetAuthorizeURL = function createGetAuthorizeURL (getpocket = {}) {
   /**
    * Builds a URL that can be used to authorize the application with the
    * getpocket service.
+   * @param options {object} an alternative consumer key
    * @return {string} the url that can be used to authorize the application
    */
-  return function getAuthorizationURL ({ requestToken = '' } = {}) {
-    if (getpocket === {}) {
-      throw new Error(ERR_MODULE_NOT_INITIALIZED);
-    }
+const getAuthorizationURL = function getAuthorizationURL ({ requestToken = '' } = {}) {
+  if (typeof requestToken !== 'string' || requestToken === '') {
+    throw new Error(ERR_NO_REQUEST_TOKEN);
+  }
+  return pocket().getAuthorizationURL(createConfig({ request_token: requestToken }));
+};
+
+/**
+ * Gets an access token from the getpocket webservice endpoint, given a request token that was
+ * previously confirmed by the user.
+ * @param options {object} the request token (required) and an alternative consumer key
+ * @return {Promise} a promise that either resolves with the token string, or
+ * rejects with an error message
+ */
+const obtainAccessToken = function obtainAccessToken ({
+  consumerKey = PICKPOCKET_CONSUMER_KEY,
+  requestToken = ''
+} = {}) {
+  return new Promise((resolve, reject) => {
     if (typeof requestToken !== 'string' || requestToken === '') {
       throw new Error(ERR_NO_REQUEST_TOKEN);
     }
-    return getpocket.getAuthorizeURL({
-      consumer_key: getpocket.config.consumer_key,
-      request_token: requestToken,
-      redirect_uri: REDIRECT_URI
+    const options = createConfig({
+      consumer_key: consumerKey,
+      request_token: requestToken
     });
-  };
-};
-
-const createObtainAccessToken = function createObtainAccessToken (getpocket = {}) {
-  return function obtainAccessToken ({ requestToken = '' } = {}) {
-    return new Promise((resolve, reject) => {
-      if (typeof requestToken !== 'string' || requestToken === '') {
-        throw new Error(ERR_NO_REQUEST_TOKEN);
+    pocket(options).getAccessToken(options, (err, resp, body) => {
+      if (err) {
+        reject(new Error(err));
+      } else if (!body.startsWith('{')) {
+        reject(new Error(ERR_NO_REQUEST_TOKEN));
+      } else {
+        const json = JSON.parse(body);
+        const accessToken = json.access_token;
+        resolve(accessToken);
       }
-      const params = {
-        request_token: requestToken
-      };
-      getpocket.getAccessToken(params, (err, resp, body) => {
-        if (err) {
-          reject(new Error(err));
-        } else if (!body.startsWith('{')) {
-          reject(new Error(ERR_NO_REQUEST_TOKEN));
-        } else {
-          const json = JSON.parse(body);
-          const accessToken = json.access_token;
-          getpocket.refreshConfig(Object.assign(
-            {},
-            getpocket.config,
-            { access_token: accessToken }
-          ));
-          resolve(accessToken);
-        }
-      });
     });
-  };
+  });
 };
 
 module.exports = ({
@@ -187,18 +189,12 @@ module.exports = ({
   const getpocket = new GetPocket(config);
   // TODO: Use stampit for ths?
   return {
-    authorize: () => createObtainRequestToken(getpocket)().then(t => ({
-      token: t,
-      authorizationUrl: createGetAuthorizeURL(getpocket)({ requestToken: t })
-    })),
-    isAuthorized: () => (typeof getpocket.config.access_token === 'string'
-      && getpocket.config.access_token !== ''),
     getAllArticles: createGetAllArticles(getpocket),
     getOverdueArticles: createGetOverdueArticles(getpocket),
-    getAuthorizationURL: createGetAuthorizeURL(getpocket),
+    getAuthorizationURL: getAuthorizationURL,
     archiveOverdueArticles: createArchiveOverdueArticles(getpocket, log, { archive: true }),
-    obtainAccessToken: createObtainAccessToken(getpocket),
-    obtainRequestToken: createObtainRequestToken(getpocket),
+    obtainAccessToken: obtainAccessToken,
+    obtainRequestToken: obtainAccessToken,
     setAccessToken: (token) => getpocket.refreshConfig(Object.assign(
       {},
       getpocket.config,

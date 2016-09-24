@@ -2,7 +2,7 @@
   "name": "pickpocket",
   "version": "0.2.1",
   "description": "Automatically archives unread items matching specific (configurable) criteria from the user's list to retain a slim list.",
-  "main": "pickpocket.js",
+  "main": "pickpocketApi.js",
   "dependencies": {
     "lodash.values": "^4.3.0",
     "node-getpocket": "^1.0.0"
@@ -33,6 +33,7 @@
   "homepage": "https://github.com/janis-kra/Pickpocket#readme",
   "files": [
     "pickpocket.js",
+    "pickpocketApi.js",
     "articles.js"
   ]
 }

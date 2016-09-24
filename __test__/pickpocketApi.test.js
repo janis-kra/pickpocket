@@ -1,14 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 require('dotenv').config();
 const test = require('ava').test;
-const pickpocket = require('../pickpocket');
-
-const p = pickpocket({
-  consumerKey: process.env.CONSUMER_KEY
-});
+const p = require('../pickpocketApi');
 
 test('calling archive without access token', async t =>
-  t.throws(p.archive(), Error,
+  t.throws(p.archive, Error,
     'calling archive without an access token should result in an error')
 );
 

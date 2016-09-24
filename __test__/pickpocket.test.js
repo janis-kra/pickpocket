@@ -1,20 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 require('dotenv').config();
 const test = require('ava').test;
-const pickpocket = require('../pickpocket');
-
-const p = pickpocket({
-  consumerKey: process.env.CONSUMER_KEY
-});
-
-test('instantiating the module without parameters', async t =>
-  t.truthy(() => pickpocket(), 'module creation without parameters is allowed')
-);
-
-test('instantiating the module with invalid parameter type boolean', async t =>
-  t.throws(() => pickpocket({ consumerKey: true }), Error,
-    'module creation wihtout parameters should throw an error')
-);
+const p = require('../pickpocket');
 
 test('calling getAllArticles with unauthorized getpocket module', async t =>
   t.throws(p.getAllArticles(), Error,

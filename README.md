@@ -15,18 +15,18 @@ I will probably add other options while the development of Pickpocket advances.
 
 If pickpocket archived an item *foo* that you are totally gonna read sometime in the future - no problem. In any pocket app, go to your archive and re-add it. Also, the item will not be archived by pickpocket again in the near future, because the `time_added` for *foo* is now automatically set to the current time (not the one it was originally added on).
 
-##Tasks
+## features
 
- * :white_check_mark: implement basic functionality in the main module, this includes:
-   * :white_check_mark: authorization
-   * :white_check_mark: archive via lifespan criteria
- * (optional / later) create a CLI that allows Pickpocket to be run via terminal
-   * deployment via `now` or a similar service possible
- * add a killer application image (such as, a hand pickpocketing something from somewhere...)
- * :white_check_mark: implement delete-by-date feature
- * implement additional features:
-    * whitelisting via tag
-    * whitelisting via source
-    * :white_check_mark: whitelisting via favorited / not favorited
-    * add a dedicated *pickpocket* tag to items that are archived by pickpocket (this way you have an immediate feedback that pickpocket is poking around in your pocket account)
-    * ...
+ * authorization via `authorize` function
+ * archive overdue articles via lifespan and favorited / non-favorited criteria
+  * adds a dedicated *archived by pickpocket* tag to items that are archived by pickpocket (this way you have an immediate feedback that pickpocket is poking around in your pocket account)
+
+## todo
+
+ * whitelisting via tag
+ * whitelisting via source
+
+## see also
+
+ * [pickpocket-cli](https://github.com/janis-kra/pickpocket-cli) that allows Pickpocket to be run via terminal
+ * [pickpocket-webservice](https://github.com/janis-kra/pickpocket-webservice) that allows Pickpocket to be deployed as a REST-webservice

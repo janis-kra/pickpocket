@@ -4,19 +4,17 @@ const articles = require('./articles');
 const values = require('lodash.values');
 
 const PICKPOCKET_CONSUMER_KEY = '30843-dc2a59fc91f1549e81c9101d';
-const REDIRECT_URI = 'http://janis-kra.github.io/Pickpocket';
-const ERR_MODULE_NOT_INITIALIZED = 'module not initialized correctly ' +
-  '(pass your consumer key as a parameter)';
+const REDIRECT_URI = 'http://janis-kra.github.io/pickpocket/';
 const ERR_NO_REQUEST_TOKEN = 'no (valid) request token given - get one ' +
   'by calling obtainRequestToken';
 
-const pocket = (config) => new GetPocket(config);
-
-const createConfig = (options) => Object.assign(
+const createConfig = options => Object.assign(
   {},
   { consumer_key: PICKPOCKET_CONSUMER_KEY, redirect_uri: REDIRECT_URI },
   options
 );
+
+const pocket = config => new GetPocket(config || createConfig());
 
 /**
  * Get all articles that comply with the given filtering options. The articles will by default only
@@ -32,8 +30,7 @@ const getAllArticles = function getAllArticles (
   return new Promise((resolve, reject) => {
     const config = createConfig({ access_token: token });
     const params = Object.assign({
-      detailType: 'simple',
-      access_token: token
+      detailType: 'simple'
     }, options);
     pocket(config).get(params, (err, res) => {
       if (err) {
@@ -63,7 +60,7 @@ const getOverdueArticles = function getOverdueArticles (token = '', {
     sort: 'oldest',
     state: 'unread'
   };
-  return getAllArticles({ token: token }, options).then((a) => {
+  return getAllArticles(token, options).then((a) => {
     const deletionThreshold = new Date();
     deletionThreshold.setMonth(deletionThreshold.getMonth() - maxMonths);
     return articles.filter(values(a.list), {
@@ -82,11 +79,16 @@ const addArchivedTag = function addArchivedTag (token = '', items = []) {
   const params = {
     actions: items.map(item => ({
       action: 'tags_add',
-      item_id: item.item_id
+      item_id: item.item_id,
+      tags: 'deleted by pickpocket'
     }))
   };
   return new Promise((resolve, reject) => {
+    if (items.length === 0) {
+      resolve(true);
+    }
     const config = createConfig({ access_token: token });
+    console.log(`token: ${token}, params: ${JSON.stringify(params)}`);
     pocket(config).send(params, (err, res) => {
       if (res) {
         resolve(true);
@@ -110,21 +112,28 @@ const archiveOverdueArticles = function archiveOverdueArticles (token = '', {
     includeFavorites = false,
     maxMonths = 6
   } = {}) {
-  const archivedArticles = [];
-  getOverdueArticles({
+  return getOverdueArticles(token, {
     includeFavorites: includeFavorites,
     maxMonths: maxMonths
   }).then((overdueArticles) => {
+    const archivedArticles = [];
     const config = createConfig({ access_token: token });
     const p = pocket(config);
-    for (const article of overdueArticles) {
+    for (let article of overdueArticles) {
       p.archive({ item_id: article.item_id }, (err) => {
-        if (!err) {
-          archivedArticles.push(article);
+        if (err) {
+          console.error(`error deleting article ${JSON.stringify(article)}`);
         }
       });
+      archivedArticles.push(article);
     }
-  }).then(() => addArchivedTag(token, archivedArticles));
+    return archivedArticles;
+  }).then(
+    (archivedArticles) => {
+      addArchivedTag(token, archivedArticles);
+      return archivedArticles;
+    }
+  );
 };
 
 /**
@@ -160,7 +169,8 @@ const getAuthorizationURL = function getAuthorizationURL ({ requestToken = '' } 
   if (typeof requestToken !== 'string' || requestToken === '') {
     throw new Error(ERR_NO_REQUEST_TOKEN);
   }
-  return pocket().getAuthorizeURL(createConfig({ request_token: requestToken }));
+  const config = createConfig({ request_token: requestToken });
+  return pocket().getAuthorizeURL(config);
 };
 
 /**

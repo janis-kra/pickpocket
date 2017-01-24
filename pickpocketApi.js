@@ -10,5 +10,6 @@ module.exports = {
   authorize: () => p.obtainRequestToken().then(t => ({
     token: t,
     url: p.getAuthorizationURL({ requestToken: t })
-  }))
+  })),
+  getAccessToken: (requestToken = '') => p.obtainAccessToken({ requestToken: requestToken })
 };
